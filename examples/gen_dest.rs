@@ -3,9 +3,9 @@ extern crate i2p;
 extern crate log;
 
 use log::*;
-use std::{thread, time};
 use std::io::{Read, Write};
 use std::str::from_utf8;
+use std::{thread, time};
 
 use i2p::SamConnection;
 

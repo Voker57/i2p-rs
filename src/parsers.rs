@@ -1,6 +1,4 @@
-use nom::{
-	alphanumeric, alt, do_parse, named, separated_list, space, tag_s, take_till_s,
-};
+use nom::{alphanumeric, alt, do_parse, named, separated_list, space, tag_s, take_till_s};
 
 fn is_space(chr: char) -> bool {
 	chr == ' ' || chr == '\t'
@@ -19,70 +17,70 @@ fn is_double_quote(chr: char) -> bool {
 }
 
 named!(quoted_value <&str, &str>,
-    do_parse!(
-             tag_s!("\"")                  >>
-        val: take_till_s!(is_double_quote) >>
-             tag_s!("\"")                  >>
-        (val)
-    )
+	do_parse!(
+			 tag_s!("\"")                  >>
+		val: take_till_s!(is_double_quote) >>
+			 tag_s!("\"")                  >>
+		(val)
+	)
 );
 
 named!(value <&str, &str>, take_till_s!(is_space_or_next_line));
 
 named!(key_value <&str, (&str, &str)>,
-    do_parse!(
-        key: alphanumeric               >>
-             tag_s!("=")                >>
-        val: alt!(quoted_value | value) >>
-        (key, val)
-    )
+	do_parse!(
+		key: alphanumeric               >>
+			 tag_s!("=")                >>
+		val: alt!(quoted_value | value) >>
+		(key, val)
+	)
 );
 
 named!(keys_and_values<&str, Vec<(&str, &str)> >, separated_list!(space, key_value));
 
 named!(pub sam_hello <&str, Vec<(&str, &str)> >,
-    do_parse!(
-              tag_s!("HELLO REPLY ") >>
-        opts: keys_and_values        >>
-              tag_s!("\n")           >>
-        (opts)
-    )
+	do_parse!(
+			  tag_s!("HELLO REPLY ") >>
+		opts: keys_and_values        >>
+			  tag_s!("\n")           >>
+		(opts)
+	)
 );
 
 named!(pub sam_session_status <&str, Vec<(&str, &str)> >,
-    do_parse!(
-              tag_s!("SESSION STATUS ") >>
-        opts: keys_and_values           >>
-              tag_s!("\n")              >>
-        (opts)
-    )
+	do_parse!(
+			  tag_s!("SESSION STATUS ") >>
+		opts: keys_and_values           >>
+			  tag_s!("\n")              >>
+		(opts)
+	)
 );
 
 named!(pub sam_stream_status <&str, Vec<(&str, &str)> >,
-    do_parse!(
-              tag_s!("STREAM STATUS ") >>
-        opts: keys_and_values          >>
-              tag_s!("\n")             >>
-        (opts)
-    )
+	do_parse!(
+			  tag_s!("STREAM STATUS ") >>
+		opts: keys_and_values          >>
+			  tag_s!("\n")             >>
+		(opts)
+	)
 );
 
 named!(pub sam_naming_reply <&str, Vec<(&str, &str)> >,
-    do_parse!(
-              tag_s!("NAMING REPLY ") >>
-        opts: keys_and_values         >>
-              tag_s!("\n")            >>
-        (opts)
-    )
+	do_parse!(
+			  tag_s!("NAMING REPLY ") >>
+		opts: keys_and_values         >>
+			  tag_s!("\n")            >>
+		(opts)
+	)
 );
 
 named!(pub sam_dest_reply <&str, Vec<(&str, &str)> >,
-    do_parse!(
-              tag_s!("DEST REPLY ") >>
-        opts: keys_and_values       >>
-              tag_s!("\n")          >>
-        (opts)
-    )
+	do_parse!(
+			  tag_s!("DEST REPLY ") >>
+		opts: keys_and_values       >>
+			  tag_s!("\n")          >>
+		(opts)
+	)
 );
 
 #[cfg(test)]
@@ -163,11 +161,15 @@ mod tests {
 		);
 
 		assert_eq!(
-			sam_naming_reply("NAMINGREPLY RESULT=KEY_NOT_FOUND\n").unwrap_err().into_error_kind(),
+			sam_naming_reply("NAMINGREPLY RESULT=KEY_NOT_FOUND\n")
+				.unwrap_err()
+				.into_error_kind(),
 			ErrorKind::Tag
 		);
 		assert_eq!(
-			sam_naming_reply("NAMING  REPLY RESULT=KEY_NOT_FOUND\n").unwrap_err().into_error_kind(),
+			sam_naming_reply("NAMING  REPLY RESULT=KEY_NOT_FOUND\n")
+				.unwrap_err()
+				.into_error_kind(),
 			ErrorKind::Tag
 		);
 	}
